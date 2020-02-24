@@ -1,18 +1,18 @@
-import numpy as np
-import argparse
-
 class SudokuGame():
     def __init__(self, **kwargs):
-        self.boardtype = "empty"
-        for key, value in kwargs.items():
-            if key == "boardtype":
-                self.boardtype = value
-        self.__init_board()
+        self.__init_board(0)
 
-    def __init_board(self):
-        if self.boardtype == "empty":
-            self.board = np.zeros([9,9])
-        elif self.boardtype == "random":
-            self.board = np.random.randint(10, size=[9,9])
-        #print(self.board)
+    def __init_board(self, boardID):
+        with open("sudokuboards.txt", 'r') as f:
+            lines = f.readlines()
+            index = boardID * 10 - 10
+            self.board = []
+            for i in range(index+1, index+10):
+                string = lines[i]
+                row = []
+                for j in range(9):
+                    row.append(int(string[j]))
+                self.board.append(row)
 
+    def load_new_board(self, boardID):
+        self.__init_board(boardID)

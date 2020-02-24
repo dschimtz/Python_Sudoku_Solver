@@ -1,4 +1,4 @@
-import range(10) as tk
+import tkinter as tk
 from sudokugame import SudokuGame
 
 class SudokuFrame(tk.Frame):
@@ -20,6 +20,12 @@ class SudokuFrame(tk.Frame):
         self.pack(fill=tk.BOTH )
         self.canvas = tk.Canvas(width = self.width, height = self.height)
         self.canvas.pack(fill=tk.BOTH, side=tk.TOP)
+
+        var = tk.StringVar(self.parent)
+        var.set("0")
+        self.dropdown = tk.OptionMenu(self.parent, var, "one", "two", "three")
+        self.dropdown.pack(side=tk.LEFT)
+        
 
         self.__draw_grid()
         self.__draw_numbers()
@@ -45,7 +51,7 @@ class SudokuFrame(tk.Frame):
     def __draw_numbers(self):
         for i in range(9):
             for j in range(9):
-                if self.game.board[i,j] != 0:
+                if self.game.board[i][j] != 0:
                     x = self.margin + i * self.side + self.side / 2
                     y = self.margin + j * self.side + self.side / 2
                     self.canvas.create_text(x, y, text=self.game.board[i][j])
