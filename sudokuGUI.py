@@ -1,20 +1,34 @@
 import tkinter as tk
 from sudokugame import SudokuGame
+import numpy as np
 
 class SudokuFrame(tk.Frame):
     def __init__(self, parent, game):
+        """initializes the UI
+
+        Args:
+          parent (master TK frame): master frame where the SudokuFrame is stored
+          game (SudokuGame object): sudoku game that holds the game's current state
+        """
+
         super().__init__()
         self.parent = parent
         self.game = game
 
-        self.margin = 20
-        self.side = 50
-        self.width = self.margin * 2 + self.side * 9
-        self.height = self.margin * 2 + self.side * 9
+        # Used to draw the grid and the numbers
+        self.margin = 20    # The width of the margin in pixels
+        self.side = 50  # The width/height of each cell
+        self.width = self.margin * 2 + self.side * 9    # Width of entire sudoku board
+        self.height = self.margin * 2 + self.side * 9   # Height of entire sudoku board
 
         self.__create_sudoku_UI()
 
     def __create_sudoku_UI(self):
+        """ Creates the UI which will be contained inside a canvas. Sets 
+        the title, creates a dropdown where user can select a starting grid,
+        a dropdown where the user can select their algorithm, and a button that
+        starts the algorithm
+        """
         self.parent.title("Sudoku")
 
         self.pack(fill=tk.BOTH )
@@ -66,22 +80,38 @@ class SudokuFrame(tk.Frame):
             self.canvas.create_line(x0, y0, x1, y1, fill=color)
 
     def __draw_init_numbers(self, *args):
+        """Draws the initial configuration. Called when the user selects
+        a new grid from the grid dropdown menu, or when the grid is first
+        drawn.
+        """
         self.__delete_all_numbers()
         boardID = int(self.dropdown_var.get()[-2:])
-        self.game.load_new_board(boardID)
+
+        """Store the initial configuration such that the initial numbers and the
+        ones inputted by an algorithm can be differentiated, such that the two
+        can be drawn in two different colors"""
+        self.init_board = self.game.load_new_board(boardID)
+
         for i in range(9):
             for j in range(9):
                 if self.game.board[i][j] != 0:
                     x = self.margin + i * self.side + self.side / 2
                     y = self.margin + j * self.side + self.side / 2
-                    self.canvas.create_text(x, y, text=self.game.board[i][j], tag="numbers")
+                    self.canvas.create_text(x, y, text=self.game.board[i][j], tag="numbers", fill="black")
+
+    def update_numbers(self):
+        for i in range(9):
+            for j in range(9):
+                # Only draw the number if it isn't blank and if it isn't part of the starting configuration
+                if self.game.board[i][j] != 0 and self.init_board[i][j] == 0:
+                    x = self.margin + i * self.side + self.side / 2
+                    y = self.margin + j * self.side + self.side / 2
+                    self.canvas.create_text(x, y, text=self.game.board[i][j], tag="numbers", fill="green")
 
     def __delete_all_numbers(self):
         self.canvas.delete("numbers")
 
 root = tk.Tk()
-game = SudokuGame(boardtype="random")
-
+game = SudokuGame()
 sudokuUI = SudokuFrame(root, game)
-
 root.mainloop()
